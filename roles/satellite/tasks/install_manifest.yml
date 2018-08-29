@@ -8,4 +8,4 @@
     group: root
 
 - name: SATELLITE | upload_manifest | Upload manifest to Satellite server
-  command: /usr/bin/hammer --password "{{ vault_sat_admin_pwd }}" subscription upload --organization "{{ sat_org }}"  --file /root/satellite_manifest.zip
+  command: /usr/bin/hammer --password "{{ vault_sat_admin_pwd }}" subscription upload --organization "{{ sat_org }}"  --file /root/satellite_manifest.zip --repository-url "{{ upstream_cdn_path }}"

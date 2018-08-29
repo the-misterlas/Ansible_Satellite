@@ -1,27 +1,9 @@
 ---
-## Common Variables
-rhn_pool_name: "8a85f9873f77744e013f8944ab3a67ed"
-register_SM: true
-install_packages: true
-enable_repos: true
-foreman_ssh_key:  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFHL3gCfn2PoMulZuFVahQfMZTMBzerUzLG+zcJspY7Drz6xdTyayfmvkcF1Gm2VvhcBQhzH3cFcd3j/FJois4w2uWH2HOhaka75TifLKOUxm6BdrK6yW1/XDZLYP3eZM09K5Z9Oyiq6JG3+6oOdMPgmNUf9MpVYk/KGL/qhHp9WCzbzHKxr9Jsqx9K3RDedNFouJ2wpq5n8dfZF9jJ2J0fhp6LxG2CGla+VWk9ki3IWX2+u7jI5eRqU/XYZiLlTU4O53SN7H1JdE5E00rkQlsUy2IvC9urFZP3aiUycct9rsQVEBlpoB5Tg4rj4JTjb370W9X0k4DWdKCMt7TOr8J foreman-proxy@sat-c.alliey.local"
-
-ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCh09zn2bGuNZnkiZvMgpgwBqKwZz7+eokBoL0SEkpL+gz/WR9MgpCbdmdtHDw+hXPKMzWs6+lt/nFmN4/f9WtMWCTkEJ0+nptp5RJLo8YHckm+ZGNnAwrz3PLe+t7Gem7iR/ZasgAEq6fbTdBevSLzhAvB19fhZWgxOMK1jMAXEQyL1ljC2y/5A+QD1ILTV42QbtBzOJexqf/oCwVPaS/tSErslN7EGC560cnbpNJvNz8BI8dTczRlCp7Z7/ZSwoWDL220Aj4fxM8uxw9CNWh3weDbdGjkBasEQ5dXEe1Wp+h8UwB4a1npJwumROGQ44qBoY/uXX7T9CBsElEwtOVN calliey@calliey.remote.csb"
-
-
-## IdM Variables
-idm_realm: "ALLIEY.LOCAL"
-idm_domain: "alliey.local"
-vault_idm_admin_pwd: "idmpassword"
-idm_forwarder: "192.168.1.1"
-idm_server: "192.168.1.50"
 
 # Satellite Variables
-sat_server: sat-c.alliey.local
-sat_server_ip: "192.168.122.215"
-satellite_remote_user: satuser
-sat_org: Alliey
-sat_location: Home
+sat_org: Default_first_org
+sat_location: Default_first_location
+upstream_cdn_path: https://cdn.redhat.com
 
 config_lvm: true          # must be set to true in order to configure drives
 create: true                     # set to true if creating a new logical volume (do not set extend or resize to true)
