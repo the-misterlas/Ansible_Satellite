@@ -7,7 +7,20 @@ Ansible playbooks to build my home lab environment
   inventory.txt - contains a list of hosts and groups them by function  
   /group_vars/all/vars/main.yml - variable file  
   /group_vars/all/vault/main.yml - vault file  
+  /roles/satellite/files/satellite_manifest.zip  - manifest file downloaded from Red Hat  
 
+# Downloading Manifest file:  
+  Go to http://rhn.redhat.com.  
+  Click "Subscription Allocations"  
+  Select "New Subscription Allocation"  
+  Enter name: "Satellite"  
+  Select Type:  "6.3"  
+  Click "Create"  
+  Click "Subscriptions" and add the subscriptions and number of subscriptions to include in the manifest.  
+  Select "Submit"   
+  Click on "Export Manifest"  
+  Name the file "satellite_manifest.zip" and download it to the /roles/satellite/files/ folder  
+  
 # Roles:  
   satellite - Install Satellite 6.3.x   
 
