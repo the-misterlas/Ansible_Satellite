@@ -29,7 +29,7 @@ content_lvs:
     mnt_dir: '/var/cache/pulp'
     filesystem: 'xfs'
   - name: 'lv_pulp'
-    size: '130G'
+    size: '129G'
     mnt_dir: '/var/lib/pulp'
     filesystem: 'xfs'
   - name: 'lv_mongodb'
