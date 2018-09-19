@@ -43,12 +43,5 @@ Ansible playbooks to build my home lab environment
 # Vault Usage
 A vault is used to manage admin passwords for this environment.  
 
- To recreate the vault file:
-  - rm ansible-vault create group_vars/all/vault/vault.yml
-  - ansible-vault create group_vars/all/vault/vault.yml
-
-The variables in use in the vault are: 
-
- # Satellite Variables:
-  - vault_sat_admin_name: "admin_name"
-  - vault_sat_admin_pwd: "admin_password"
+ Vaulted values are store inline in roles/satellite/vars/main.yml.  To recreate:
+  - ansible-vault encrypt_string Password123 --ask-vault-pass
