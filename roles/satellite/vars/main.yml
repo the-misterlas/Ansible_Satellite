@@ -88,10 +88,10 @@ satellite_repos:
 #6.4 beta:
 #satellite_repos:
 #  - rhel-7-server-rpms
-#  - server-rhscl-7-rpms
-#  - server-7-satellite-6-beta-rpms
-#  - 7-server-satellite-maintenance-6-beta-rpms
-#  - 7-server-ansible-2.6-rpms
+#  - rhel-server-rhscl-7-rpms
+#  - rhel-server-7-satellite-6-beta-rpms
+#  - rhel-7-server-satellite-maintenance-6-beta-rpms
+#  - rhel-7-server-ansible-2.6-rpms
 
 #sync values might need increased depending upon connection
 pulp_content_sync_retries: 30 #number of retries before failing sync
