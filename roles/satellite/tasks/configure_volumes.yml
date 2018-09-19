@@ -1,95 +1,48 @@
 ---
-- name: rescanning for new disks
-  shell: /usr/bin/rescan-scsi-bus.sh
+- name: Scan for new disks
+  shell: /usr/sbin/pvscan 
   when: config_lvm and ansible_os_family == "RedHat"
+  tags:
+    - disks
 
-- name: creating new LVM volume group
+- name: Create VG
   lvg:
-    vg={{ create_vgname }}
-    pvs={{ new_disk }} state=present
+    vg: "{{ content_vgname }}"
+    pvs: "{{ content_disk }}"
+    state: present
   when: create and config_lvm
+  tags:
+    - disks
 
-- name: creating cache_lv logical volume
+- name: Create LV
   lvol:
-    vg={{ create_vgname }}
-    lv={{ create_cache_lv }}
-    size={{ cache_lvsize }}
+    vg: "{{ content_vgname }}"
+    lv: "{{ item.name }}"
+    size: "{{ item.size }}"
   when: create and config_lvm
+  with_items:
+    - "{{ content_lvs }}"
+  tags:
+    - disks
 
-- name: creating mongodb_lv logical volume
-  lvol:
-    vg={{ create_vgname }}
-    lv={{ create_mongodb_lv }}
-    size={{ mongodb_lvsize }}
-  when: create and config_lvm
-
-- name: creating pgsql_lv logical volume
-  lvol:
-    vg={{ create_vgname }}
-    lv={{ create_pgsql_lv }}
-    size={{ pgsql_lvsize }}
-  when: create and config_lvm
-
-- name: creating pulp_lv logical volume
-  lvol:
-    vg={{ create_vgname }}
-    lv={{ create_pulp_lv }}
-    size={{ pulp_lvsize }}
-  when: create and config_lvm
-  ignore_errors: yes
-
-- name: creating filesystem on cache_lv
+- name: Create filesystems
   filesystem:
-     fstype={{ filesystem }}
-     dev=/dev/{{ create_vgname }}/{{ create_cache_lv }}
+    fstype: "{{ item.filesystem }}"
+    dev: "/dev/{{ content_vgname }}/{{ item.name }}"
   when: create and config_lvm
+  with_items:
+    - "{{ content_lvs }}"
+  tags:
+    - disks
 
-- name: creating filesystem on pulp_lv
-  filesystem:
-     fstype={{ filesystem }}
-     dev=/dev/{{ create_vgname }}/{{ create_pulp_lv }}
-  when: create and config_lvm
-
-- name: creating filesystem on mongodb_lv
-  filesystem:
-     fstype={{ filesystem }}
-     dev=/dev/{{ create_vgname }}/{{ create_mongodb_lv }}
-  when: create and config_lvm
-
-- name: creating filesystem on pgsql_lv
-  filesystem:
-     fstype={{ filesystem }}
-     dev=/dev/{{ create_vgname }}/{{ create_pgsql_lv }}
-  when: create and config_lvm
-
-- name: mount pulp_cache
+- name: Mount filesystems
   mount:
-    name={{ mnt_pulp_cache}}
-    src=/dev/{{ create_vgname }}/{{ create_cache_lv }}
-    fstype={{ filesystem }}
-    state=mounted
+    path: "{{ item.mnt_dir }}"
+    src: "/dev/{{ content_vgname }}/{{ item.name }}"
+    fstype: "{{ item.filesystem }}"
+    state: mounted
   when: create and config_lvm
-
-- name: mount pulp
-  mount:
-    name={{ mnt_pulp }}
-    src=/dev/{{ create_vgname }}/{{ create_pulp_lv }}
-    fstype={{ filesystem }}
-    state=mounted
-  when: create and config_lvm
-
-- name: mount mongodb
-  mount:
-    name={{ mnt_mongodb }}
-    src=/dev/{{ create_vgname }}/{{ create_mongodb_lv }}
-    fstype={{ filesystem }}
-    state=mounted
-  when: create and config_lvm
-
-- name: mount pgsql
-  mount:
-    name={{ mnt_pgsql }}
-    src=/dev/{{ create_vgname }}/{{ create_pgsql_lv }}
-    fstype={{ filesystem }}
-    state=mounted
-  when: create and config_lvm
+  with_items:
+    - "{{ content_lvs }}"
+  tags:
+    - disks

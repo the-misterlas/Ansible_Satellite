@@ -1,0 +1,20 @@
+<%#
+name: Default-Part-STIG
+snippet: false
+model: Ptable
+os_family: Redhat
+%>
+zerombr
+clearpart --all --initlabel
+# Disk partitioning information
+part pv.157 --fstype="lvmpv" --ondisk=sda --size=39935
+part /boot --fstype="xfs" --ondisk=sda --size=1024
+volgroup sysvg --pesize=4096 pv.157
+logvol /var/log  --fstype="xfs" --size=2048 --name=log --fsoptions="defaults,nodev" --vgname=sysvg
+logvol /var/log/audit  --fstype="xfs" --size=2048 --name=audit --fsoptions="defaults,nodev" --vgname=sysvg
+logvol /home  --fstype="xfs" --size=1024 --name=home --fsoptions="defaults,nodev,nosuid" --vgname=sysvg
+logvol /  --fstype="xfs" --size=12288 --name=root --fsoptions="defaults,nodev" --vgname=sysvg
+logvol /var  --fstype="xfs" --size=2048 --name=var --fsoptions="defaults,nodev" --vgname=sysvg
+logvol /dev/shm  --fstype="xfs" --size=4096 --fsoptions="defaults,nodev,nosuid" --name=shm --vgname=sysvg
+logvol swap  --fstype="swap" --size=3968 --name=swap --vgname=sysvg
+logvol /tmp  --fstype="xfs" --size=1024 --name=tmp --fsoptions="defaults,nodev,nosuid,noexec" --vgname=sysvg

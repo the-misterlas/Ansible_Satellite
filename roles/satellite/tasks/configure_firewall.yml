@@ -1,11 +1,37 @@
 ---
-- name: SATELLITE | firewall | Enable service in firewall
-  firewalld:
-    service: "RH-Satellite-6"
-    permanent: yes
-    state: enabled
-
-- name: Bounce firewalld
+- name: Configuring Firewall for Satellite Communication
   service:
-     name=firewalld
-     state=restarted
+    state: started
+    enabled: yes
+    name: firewalld
+  tags:
+    - firewall
+
+- firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - RH-Satellite-6
+    - tftp
+    - dns
+    - dhcp
+  tags:
+    - firewall
+
+- name: Open firewall port for ocp container registry
+  firewalld:
+    port: 5000/tcp
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - firewall
+
+- name: Restart firewalld
+  service:
+    name: firewalld
+    state: restarted
+  tags:
+    - firewall

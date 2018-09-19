@@ -1,0 +1,17 @@
+---
+- name: Create Life Cycle Environments
+  shell: /usr/bin/hammer lifecycle-environment create \
+         --name "{{ item.name }}" \
+         --label "{{ item.label }}" \
+         --prior "{{ item.prior }}" \
+         --organization "{{ sat_org }}"
+  with_items:
+    - "{{ lifecycle_envs }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - result.rc != 0  #gets enabled
+    - result.rc != 65 #already enabled
+  tags:
+    - lifecycle

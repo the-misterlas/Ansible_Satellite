@@ -1,8 +1,6 @@
 ---
 - name: Satellite Install
-  hosts: satellite
+  hosts: "{{ hostgroup }}"
   become: true
   roles:
-    - common
-#    - idm_client
     - satellite

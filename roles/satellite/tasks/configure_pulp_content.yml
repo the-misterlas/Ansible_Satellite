@@ -1,0 +1,62 @@
+---
+- name: Configure repositories to be synced
+  command: /usr/bin/hammer repository-set enable \
+           --organization "{{ sat_org }}" \
+           --product "{{ item.product }}" \
+           --name "{{ item.name }}" \
+           {% if item.basearch is defined -%} --basearch "{{ item.basearch }}" {%- endif %} \
+           {% if item.releasever  is defined -%} --releasever "{{ item.releasever }}" {%- endif %}
+  register: result
+  with_items: 
+    - "{{ pulp_content }}"
+  changed_when: 
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - ( result.rc == 70 and "409 Conflict" not in result.stderr ) or ( result.rc != 70 and result.rc != 0 )
+  tags:
+    - content
+
+- name: Create unique list of products
+  shell: /usr/bin/hammer --csv product list \
+         --enabled true \
+         --organization "{{ sat_org }}" | sed -n '1!p' | cut -d, -f2
+  register: products_to_sync
+  tags:
+    - content
+    - sync
+
+- name: Print list
+  debug:
+    msg: "{{ products_to_sync }}"
+  tags:
+    - content
+    - sync
+
+- name: Sync products
+  command: /usr/bin/hammer product synchronize \
+           --organization "{{ sat_org }}" \
+           --name "{{ item }}" \
+           --async
+  with_items: 
+    - "{{ products_to_sync.stdout_lines }}"
+  tags:
+    - content
+    - sync
+
+- name: Wait for products to sync
+  shell: for status in $(hammer --csv repository list | grep -v Id | cut -d, -f1); \
+         do \
+           hammer repository info \
+           --id $status | grep -A1 "^Sync"| grep "Status:" | grep -v Success; \
+         done
+  register: result
+  until: result.stdout == ""
+  retries: "{{ pulp_content_sync_retries }}"
+  delay: "{{ pulp_content_sync_delay }}"
+  failed_when:
+    - result.rc != 0
+    - result.rc != 1 
+  tags:
+    - content
+    - sync
+    - synctest

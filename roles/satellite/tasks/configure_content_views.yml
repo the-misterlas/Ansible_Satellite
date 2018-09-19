@@ -1,0 +1,61 @@
+---
+- name: Create Content Views
+  shell: /usr/bin/hammer content-view create --name "{{ item.cv_name }}" \
+         --label "{{ item.cv_label }}" \
+         --organization "{{ sat_org }}" \
+  with_items:
+    - "{{ content_views }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets configured
+  failed_when:
+    - result.rc != 0  #gets configured
+    - result.rc != 65 #already configured
+  tags:
+    - content
+    - content_views
+
+- name: Add repositories to Content Views
+  shell: /usr/bin/hammer content-view update --name "{{ item.cv_name }}" \
+         --organization "{{ sat_org }}" \
+         --repositories {% for repo in item.repos %}"{{ repo }}",{% endfor %}
+  with_items: 
+    - "{{ content_views }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets configured
+  failed_when:
+    - result.rc != 0  #gets configured
+    - result.rc != 65 #already configured
+  tags:
+    - content
+    - content_views
+
+- name: Publish all Content Views into Library
+  shell: /usr/bin/hammer content-view publish \
+         --name "{{ item.cv_name }}" \
+         --organization "{{ sat_org }}" \
+#         --async
+#         ##can re-enable async once a check is put in place between this step and the next
+  with_items:
+    - "{{ content_views }}"
+  tags:
+    - content
+    - content_views
+    - publish
+
+- name: Promote all Content Views to all Lifecycle Environments
+  shell: /usr/bin/hammer content-view version promote \
+         --content-view "{{ item[0].cv_name }}" \
+         --from-lifecycle-environment "{{ item[1].prior }}" \
+         --to-lifecycle-environment "{{ item[1].name }}" \
+         --organization "{{ sat_org }}" 
+  with_nested:
+    - "{{ content_views }}"
+    - "{{ lifecycle_envs }}"
+  register: result
+  tags:
+    - content
+    - content_views
+    - publish
+    - promote

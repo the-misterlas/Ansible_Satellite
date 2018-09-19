@@ -1,0 +1,66 @@
+---
+- name: Ensure required packages are on latest
+  yum:
+    name: "{{ item }}"
+    state: latest
+  when: idm_realm_setup
+  with_items:
+    - ipa-client
+    - foreman-proxy
+    - ipa-admintools
+  tags:
+    - idmrealm
+
+- name: Configure IdM client
+  shell: /usr/sbin/ipa-client-install -U \
+          --hostname "{{ ansible_fqdn }}" \
+          --server "{{ idm_vars.idm_server }}" \
+          --realm "{{ idm_vars.idm_realm }}" \
+          --domain "{{ idm_vars.idm_domain }}" \
+          --principal "{{ idm_vars.idm_principal }}" \
+          --password "{{ idm_vars.idm_password }}"
+  register: result
+  failed_when: 
+    - ( result.rc != 3 and result.rc != 0 )
+  tags:
+    - idmrealm
+ 
+- name: Run foreman realm prepare to configure capsule
+  shell: echo "{{ idm_vars.idm_password }}" | /usr/sbin/foreman-prepare-realm admin realm-capsule
+  args:
+    chdir: /root
+  when: idm_realm_setup
+  tags:
+    - idmrealm
+
+- name: Copy keytab in place
+  shell: mv /root/freeipa.keytab /etc/foreman-proxy
+  when: idm_realm_setup
+  tags:
+    - idmrealm
+
+- name: Configure ownership of keytab
+  shell: chown foreman-proxy:foreman-proxy /etc/foreman-proxy/freeipa.keytab
+  args:
+    chdir: /etc/foreman-proxy/
+  when: idm_realm_setup
+  tags:
+    - idmrealm
+
+- name: Run foreman installer to configure capsule
+  shell: satellite-installer --scenario satellite \
+         --foreman-proxy-realm true \
+         --foreman-proxy-realm-keytab /etc/foreman-proxy/freeipa.keytab \
+         --foreman-proxy-realm-principal realm-capsule@EXAMPLE.COM \
+         --foreman-proxy-realm-provider freeipa
+  when: idm_realm_setup
+  tags:
+    - idmrealm
+
+- name: Restart foreman proxy service
+  service:
+    name: foreman-proxy
+    state: restarted
+  when: idm_realm_setup
+  tags:
+    - idmrealm

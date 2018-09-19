@@ -1,8 +1,15 @@
 ---
 - import_tasks: configure_volumes.yml
-- import_tasks: install_satellite_packages.yml
 - import_tasks: configure_firewall.yml
 - import_tasks: install_satellite.yml
 - import_tasks: install_manifest.yml
+- import_tasks: configure_templates.yml
 - import_tasks: configure_downloads.yml
-
+- import_tasks: configure_pulp_content.yml
+- import_tasks: configure_lifecycle.yml
+- import_tasks: configure_content_views.yml
+- import_tasks: configure_domains.yml
+- import_tasks: configure_provisioning.yml
+- import_tasks: configure_activationkeys.yml
+- import_tasks: configure_idmrealm_setup.yml
+- import_tasks: configure_idmdns_setup.yml

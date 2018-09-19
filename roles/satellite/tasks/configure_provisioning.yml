@@ -1,0 +1,88 @@
+---
+- name: Ensure /root/post-install-setup directory exists
+  file:
+    path: /root/post-install-setup/{{ item }}
+    state: directory
+    mode: 0700
+    recurse: yes
+  with_items:
+    - templates
+  tags:
+    - provisioning
+
+# Upload and set STIG partition table and kickstart
+- name: Upload STIG Partition table
+  copy:
+    src: part-stig.erb
+    dest: /root/post-install-setup/templates/part-stig.erb
+  tags:
+    - provisioning
+
+- name: Upload default STIG Kickstart
+  copy:
+    src: kickstart-stig.erb
+    dest: /root/post-install-setup/templates/kickstart-stig.erb
+  tags:
+    - provisioning
+
+- name: Determine the os id for RedHat {{ provisioning.default_os_ver_ks }}
+  shell: /usr/bin/hammer os list --search "RedHat {{ provisioning.default_os_ver_ks }}" | awk ' /RedHat/ { print $1 }'
+  register: os_id
+  tags:
+    - provisioning
+
+- name: Upload the partition template and attach to the OS
+  shell: /usr/bin/hammer partition-table create \
+         --file /root/post-install-setup/templates/kickstart-stig.erb \
+         --locations "{{ sat_loc }}" \
+         --operatingsystem-ids "{{ os_id.stdout }}" \
+         --organizations "{{ sat_org }}" \
+         --name Default-Part-STIG \
+         --os-family Redhat \
+         --locked true
+  register: result
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - result.rc != 0  #gets enabled
+    - result.rc != 65 #already enabled
+  tags:
+    - provisioning
+
+- name: Remove Satellite default partition tables
+  shell: /usr/bin/hammer os remove-ptable \
+         --partition-table "Kickstart default" \
+         --id "{{ os_id.stdout }}"
+  tags:
+    - provisioning
+
+- name: Create Provisioning Template from file
+  shell: /usr/bin/hammer template create \
+         --file /root/post-install-setup/templates/kickstart-stig.erb \
+         --locations "{{ sat_loc }}" \
+         --operatingsystem-ids "{{ os_id.stdout }}" \
+          --organizations "{{ sat_org }}" \
+         --name Default-Kickstart-STIG \
+         --type provision \
+         --locked true
+  register: result
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - result.rc != 0  #gets enabled
+    - result.rc != 65 #already enabled
+  tags:
+    - provisioning
+
+- name: Determine kickstart id
+  shell: /usr/bin/hammer template list | awk ' /STIG/ { print $1 }'
+  register: ks_id
+  tags:
+    - provisioning
+
+- name: Set Default STIG kickstart for os
+  shell: /usr/bin/hammer os set-default-template \
+         --config-template-id "{{ ks_id.stdout }}" \
+         --id "{{ os_id.stdout }}"
+  tags:
+    - provisioning

@@ -1,0 +1,14 @@
+---
+- name: Associate domain with organization
+  shell: /usr/bin/hammer domain create \
+         --name "{{ ansible_domain }}" \
+         --organizations "{{ sat_org }}" \
+         --locations "{{ sat_loc }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - result.rc != 0  #gets enabled
+    - result.rc != 65 #already enabled
+  tags:
+    - domains

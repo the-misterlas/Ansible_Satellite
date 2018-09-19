@@ -1,11 +1,26 @@
 ---
 - name: SATELLITE | upload_manifest | Copy mainfiest file to Satellite server
   copy:
-    src: "satellite_manifest.zip"
+    src: "{{ manifest_file }}"
     dest: /root/satellite_manifest.zip
     mode: 0644
     owner: root
     group: root
+  tags:
+    - install
+    - manifest
 
 - name: SATELLITE | upload_manifest | Upload manifest to Satellite server
-  command: /usr/bin/hammer --password "{{ vault_sat_admin_pwd }}" subscription upload --organization "{{ sat_org }}"  --file /root/satellite_manifest.zip --repository-url "{{ upstream_cdn_path }}"
+  command: /usr/bin/hammer subscription upload \
+           --organization "{{ sat_org }}" \
+           --file /root/satellite_manifest.zip \
+           --repository-url "{{ upstream_cdn_path }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets uploaded
+  failed_when:
+    - result.rc != 0  #gets uploaded
+    - result.rc != 70 #already uploaded
+  tags:
+    - install
+    - manifest

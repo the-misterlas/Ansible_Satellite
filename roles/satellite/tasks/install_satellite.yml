@@ -1,13 +1,87 @@
 ---
-## Initial configuration of Satellite Server
-## Enable Standard repos
-- name: enable Repos
-  command: subscription-manager repos --enable {{ item }}
-  with_items:
-    - rhel-7-server-rpms
-    - rhel-7-server-satellite-6.3-rpms
-    - rhel-server-rhscl-7-rpms
+- name: Get registration status
+  command: /usr/sbin/subscription-manager status
+  register: subscription_manager
+  changed_when: true
+
+- name: Error if not registered
+  debug:
+    msg: Please run 'subscription-manager register' and register to Red Hat Customer Portal.
+  when: subscription_manager.rc != 0
+
+- name: Disable all repositories
+  rhsm_repository: 
+    name: "*"
+    state: disabled
   when: enable_repos
 
+- name: Enable required repositories
+  rhsm_repository: 
+    name: "{{ item }}"
+    state: enabled
+  with_items: "{{ satellite_repos }}"
+  when: enable_repos
+
+- name: Clean Yum repo cache
+  command: yum clean all
+  tags:
+    - yum
+
+- name: Ensure that Red Hat Subscription Manager is not set to use a specific operating system release.
+  command: /usr/sbin/subscription-manager release --unset
+
+- name: Update all packages
+  yum:
+    name: "*"
+    state: latest
+  register: yum_update
+
+# Check to see if a new kernel was installed during system update
+- name: Checking for new kernel
+  shell: if [ "`rpm -q kernel --queryformat '%{installtime} %{version}-%{release}.%{arch}\n' | sort -n -k1 | tail -1 | cut -d ' ' -f 2`" = "`uname -r`" ]; then echo "Latest kernel already booted."; else echo "New kernel. Reboot required."; fi
+  register: kernel_update
+  changed_when: false
+# - debug: var=kernel_update
+
+# Reboot the system in the case of new kernel install, then wait for it to come back up
+- name: Reboot the system to apply kernel updates
+  shell: sleep 2 && shutdown -r now "Ansible triggered Reboot"
+  async: 1
+  poll: 0
+  become: true
+  ignore_errors: true
+  when: "('New kernel' in kernel_update.stdout)"
+
+- name: Wait for SSH to become available
+  local_action: wait_for host={{ inventory_hostname }} state=started port=22 delay=15 timeout=300
+  become: false
+  when: "('New kernel' in kernel_update.stdout)"
+
+- name: Install Satellite packages
+  yum:
+    name: satellite
+    state: latest
+
 - name: Initial configuration of Satellite
-  command:  /usr/sbin/satellite-installer --scenario satellite --foreman-initial-organization "{{ sat_org }}" --foreman-initial-location "{{ sat_location }}" --foreman-admin-username "{{ vault_sat_admin_name }}" --foreman-admin-password "{{ vault_sat_admin_pwd }}"
+  command:  /usr/sbin/satellite-installer --scenario satellite \
+            --foreman-initial-organization "{{ sat_org }}" \
+            --foreman-initial-location "{{ sat_loc }}" \
+            --foreman-admin-username "{{ admin_username }}" \
+            --foreman-admin-password "{{ admin_pass }}" \ 
+            {% if dns_proxy -%} --foreman-proxy-dns true {%- endif %} \
+            {% if dns_proxy -%} --foreman-proxy-dns-interface "{{ dns_vars.dns_interface }}" {%- endif %} \
+            {% if dns_proxy -%} --foreman-proxy-dns-zone "{{ dns_vars.dns_zone }}" {%- endif %} \
+            {% if dns_proxy -%} --foreman-proxy-dns-forwarders "{{ dns_vars.dns_forwarders }}" {%- endif %} \
+            {% if dns_proxy -%} --foreman-proxy-dns-reverse "{{ dns_vars.dns_reverse }}" {%- endif %} \
+            {% if dhcp_proxy -%} --foreman-proxy-dhcp true {%- endif %} \
+            {% if dhcp_proxy -%} --foreman-proxy-dhcp-managed true {%- endif %} \
+            {% if dhcp_proxy -%} --foreman-proxy-dhcp-interface "{{ dhcp_vars.dhcp_interface }}" {%- endif %} \
+            {% if dhcp_proxy -%} --foreman-proxy-dhcp-range "{{ dhcp_vars.dhcp_range }}" {%- endif %} \
+            {% if dhcp_proxy -%} --foreman-proxy-dhcp-gateway "{{ dhcp_vars.dhcp_gateway }}" {%- endif %} \
+            {% if dhcp_proxy -%} --foreman-proxy-dhcp-nameservers "{{ dhcp_vars.dhcp_nameservers }}" {%- endif %} \
+            {% if tftp -%} --foreman-proxy-tftp true {%- endif %} \
+            {% if tftp -%} --foreman-proxy-tftp-servername "{{ tftp_vars.tftp_addr }}" {%- endif %} 
+  when: install
+  tags:
+    - install
+
