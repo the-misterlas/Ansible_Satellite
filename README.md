@@ -1,4 +1,6 @@
 # Ansible_Satellite Playbook
+Fork of https://github.com/calliey1/Ansible_Satellite_Day1
+
 Steps to run:
   - Build RHEL 7.x (latest) host
   - Register with Red Hat Customer Portal
