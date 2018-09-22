@@ -11,7 +11,7 @@ Steps to run:
 
 Ansible playbooks to build my home lab environment    
  usage:  
-  - ansible-playbook -i inventory satellite.yml --ask-vault-pass
+  - ansible-playbook -i inventory satellite.yml -e "hostgroup=satellite" --ask-vault-pass
 
 # Key files:  
   - inventory - contains a list of hosts and groups them by function  
