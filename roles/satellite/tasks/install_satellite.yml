@@ -3,17 +3,42 @@
   command: /usr/sbin/subscription-manager status
   register: subscription_manager
   changed_when: true
-
+  when:
+    - not disconnected
+  tags:
+    - yum
+    - disconnected
+ 
 - name: Error if not registered
   debug:
     msg: Please run 'subscription-manager register' and register to Red Hat Customer Portal.
-  when: subscription_manager.rc != 0
+  when:
+    - not disconnected and subscription_manager.rc != 0
+  tags:
+    - yum
+    - disconnected
+ 
+- name: Deploy local repo template
+  template:
+    src: redhat-local-cdn.repo.j2
+    dest: /etc/yum.repos.d/redhat-local-cdn.repo
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - disconnected
+  tags:
+    - yum
+    - disconnected
 
 - name: Disable all repositories
   rhsm_repository: 
     name: "*"
     state: disabled
   when: enable_repos
+  tags: 
+    - configure_repos
+    - yum
 
 - name: Enable required repositories
   rhsm_repository: 
@@ -21,6 +46,9 @@
     state: enabled
   with_items: "{{ satellite_repos }}"
   when: enable_repos
+  tags: 
+    - configure_repos
+    - yum
 
 - name: Clean Yum repo cache
   command: yum clean all
@@ -84,4 +112,3 @@
   when: install
   tags:
     - install
-

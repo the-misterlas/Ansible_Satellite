@@ -1,0 +1,23 @@
+[rhel-7-server-rpms]
+name: rhel-7-server-rpms
+baseurl: "http://{{ upstream_cdn_repo_server }}/pub/content/dist/rhel/server/7/7Server/x86_64/os"
+gpgcheck=0
+enable=1
+ 
+[rhel-7-server-satellite-6.3-rpms]
+name: rhel-7-server-satellite-6.3-rpms
+baseurl: "http://{{ upstream_cdn_repo_server }}/pub/content/dist/rhel/server/7/7Server/x86_64/satellite/6.3/os"
+gpgcheck=0
+enable=1
+ 
+[rhel-server-rhscl-7-rpms]
+name: rhel-server-rhscl-7-rpms
+baseurl: "http://{{ upstream_cdn_repo_server }}/pub/content/dist/rhel/server/7/7Server/x86_64/rhscl/1/os"
+gpgcheck=0
+enable=1
+ 
+[rhel-7-server-satellite-6.3-puppet4-rpms]
+name: rhel-7-server-satellite-6.3-puppet4-rpms
+baseurl: "http://{{ upstream_cdn_repo_server }}/pub/content/dist/rhel/server/7/7Server/x86_64/satellite/6.3-puppet4/os"
+gpgcheck=0
+enable=1

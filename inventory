@@ -4,5 +4,8 @@
 [satellite-beta]
 192.168.11.15   ansible_user=root
 
+[satellite-test]
+192.168.11.16   ansible_user=root
+
 [idm]
 192.168.11.27   ansible_user=root
