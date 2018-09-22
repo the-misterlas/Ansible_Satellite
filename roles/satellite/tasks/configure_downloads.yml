@@ -1,5 +1,0 @@
----
-- name: Set default sync policy to {{ default_download_policy }}
-  command: /usr/bin/hammer settings set \
-           --name default_download_policy \
-           --value "{{ default_download_policy }}"

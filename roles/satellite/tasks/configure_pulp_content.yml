@@ -1,4 +1,9 @@
 ---
+- name: Set default sync policy to {{ default_download_policy }}
+  command: /usr/bin/hammer settings set \
+           --name default_download_policy \
+           --value "{{ default_download_policy }}"
+
 - name: Configure repositories to be synced
   command: /usr/bin/hammer repository-set enable \
            --organization "{{ sat_org }}" \
@@ -24,6 +29,7 @@
   tags:
     - content
     - sync
+    - syncplan
 
 - name: Print list
   debug:
@@ -31,6 +37,7 @@
   tags:
     - content
     - sync
+    - syncplan
 
 - name: Sync products
   command: /usr/bin/hammer product synchronize \
@@ -60,3 +67,35 @@
     - content
     - sync
     - synctest
+
+- name: Create Sync Plan
+  command: /usr/bin/hammer sync-plan create \
+           --organization "{{ sat_org }}" \
+           --enabled true \
+           --name "{{ sync_plan.name }}" \
+           --interval "{{ sync_plan.interval }}" \
+           --sync-date "{{ sync_plan.startdate }}"
+  register: result
+  changed_when: 
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - ( result.rc == 65 and "Name has already been taken" not in result.stderr ) or ( result.rc != 65 and result.rc != 0 )
+  tags:
+    - content
+    - sync
+    - syncplan
+
+- name: Assign products to sync-plan
+  command: /usr/bin/hammer product set-sync-plan \
+           --organization "{{ sat_org }}" \
+           --name "{{ item }}" \
+           --sync-plan "{{ sync_plan.name }}"
+  register: result
+  with_items:
+    - "{{ products_to_sync.stdout_lines }}"
+  changed_when: 
+    - result.rc == 0
+  tags:
+    - content
+    - sync
+    - syncplan

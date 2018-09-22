@@ -94,6 +94,10 @@ satellite_repos:
 #  - rhel-7-server-ansible-2.6-rpms
 
 #sync values might need increased depending upon connection
+sync_plan:
+  name: "Daily_Sync"
+  interval: "daily"
+  startdate: "1971-01-01 03:00:00"
 pulp_content_sync_retries: 30 #number of retries before failing sync
 pulp_content_sync_delay: 60   #seconds to wait before retrying
 pulp_content:
