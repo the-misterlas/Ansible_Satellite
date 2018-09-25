@@ -232,5 +232,5 @@ activation_keys:
 
 puppet_vars:
   autosign_rules:
-    - *.example.com
-    - *.example2.com
+    - "*.example.com"
+    - "*.example2.com"
