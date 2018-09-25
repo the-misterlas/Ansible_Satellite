@@ -9,6 +9,7 @@
 - import_tasks: configure_content_views.yml
 - import_tasks: configure_domains.yml
 - import_tasks: configure_subnets.yml
+- import_tasks: configure_hostgroups.yml
 - import_tasks: configure_provisioning.yml
 - import_tasks: configure_activationkeys.yml
 - import_tasks: configure_idmrealm_setup.yml

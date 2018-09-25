@@ -1,0 +1,27 @@
+---
+- name: Create top level hostgroups
+  shell: /usr/bin/hammer hostgroup create \
+         --name "{{ item.name }}"
+  with_items:
+    - "{{ hostgroups.level_one }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - ( result.rc == 65 and "Name has already been taken" not in result.stderr ) or ( result.rc != 65 and result.rc != 0 )
+  tags:
+    - hostgroups
+
+- name: Configure second level hostgroups
+  shell: /usr/bin/hammer hostgroup create \
+         --name "{{ item.name }}" \
+         --parent "{{ item.parent }}"
+  register: result
+  with_items:
+    - "{{ hostgroups.level_two }}"
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - ( result.rc == 65 and "Name has already been taken" not in result.stderr ) or ( result.rc != 65 and result.rc != 0 )
+  tags:
+    - hostgroups

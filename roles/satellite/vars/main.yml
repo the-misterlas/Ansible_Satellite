@@ -244,3 +244,22 @@ subnets:
     network: "10.1.2.0"
     mask: "255.255.255.0"
     vlan: "200"
+
+hostgroups:
+  level_one:
+    - name: "RHEL"
+    - name: "OCP"
+    - name: "RHV"
+  level_two:
+    - name: "Development"
+      parent: "OCP"
+    - name: "Production"
+      parent: "OCP"
+    - name: "Development"
+      parent: "RHEL"
+    - name: "Production"
+      parent: "RHEL"
+    - name: "Development"
+      parent: "RHV"
+    - name: "Production"
+      parent: "RHV"
