@@ -39,31 +39,20 @@
   tags:
     - activationkeys
 
-- name: Enable default repositories for Activation Keys NOTE NOT CURRENTLY WORKING INVESTIGATING
-#  shell: /usr/bin/hammer activation-key content-override \
-#         --name "{{ item[0].cv_name }}-{{ item[1].name }}-KEY" \
-#         --content-label {% for repo in item[0].repos %}"{{ repo }}",{% endfor %} \
-#         --override-name enabled --value 1 \
-#         --organization "{{ sat_org }}" 
-  shell: for repo in $(/usr/bin/hammer --csv activation-key product-content \
+- name: Enable default repositories for Activation Keys
+  shell: for label in $(/usr/bin/hammer --csv activation-key product-content \
          --name "{{ item[0].cv_name }}-{{ item[1].name }}-KEY" \
          --organization "{{ sat_org }}" \
          | grep -v Label | cut -d, -f6);
          do
            /usr/bin/hammer activation-key content-override \
+           --content-label ${label} \
            --name "{{ item[0].cv_name }}-{{ item[1].name }}-KEY" \
-           --organization "{{ sat_org }}" 
-           --content-label ${repo} \
-           --override-name enabled --value 1;
+           --organization "{{ sat_org }}" \
+           --value 1;
          done
   with_nested:
     - "{{ content_views }}"
     - "{{ lifecycle_envs }}"
-#  register: result
-#  changed_when:
-#    - result.rc == 0  #gets enabled
-#  failed_when:
-#    - result.rc != 0  #gets enabled
-#    - result.rc != 65 #already enabled
   tags:
     - activationkeys

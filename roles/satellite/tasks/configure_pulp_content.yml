@@ -20,6 +20,7 @@
     - ( result.rc == 70 and "409 Conflict" not in result.stderr ) or ( result.rc != 70 and result.rc != 0 )
   tags:
     - content
+    - repos
 
 - name: Create unique list of products
   shell: /usr/bin/hammer --csv product list \
