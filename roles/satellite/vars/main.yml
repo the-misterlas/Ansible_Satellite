@@ -234,3 +234,13 @@ puppet_vars:
   autosign_rules:
     - "*.example.com"
     - "*.example2.com"
+
+subnets:
+  - name: "Example_Subnet_1"
+    network: "10.1.1.0"
+    mask: "255.255.255.0"
+    vlan: ""
+  - name: "Example_Subnet_2"
+    network: "10.1.2.0"
+    mask: "255.255.255.0"
+    vlan: "200"

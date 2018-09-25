@@ -1,0 +1,35 @@
+---
+- name: Create subnet
+  shell: /usr/bin/hammer subnet create \
+         --name "{{ item.name }}" \
+         --network "{{ item.network }}" \
+         --mask "{{ item.mask }}" \
+         --organizations "{{ sat_org }}" \
+         --locations "{{ sat_loc }}"
+  with_items:
+    - "{{ subnets }}"
+  register: result
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - ( result.rc == 65 and "Name has already been taken" not in result.stderr ) or ( result.rc != 65 and result.rc != 0 )
+  tags:
+    - subnets
+
+- name: Configure subnets
+  shell: /usr/bin/hammer subnet update \
+         --name "{{ item.name }}" \
+         --network "{{ item.network }}" \
+         --mask "{{ item.mask }}" \
+         --vlanid "{{ item.vlan }}" \
+         --organizations "{{ sat_org }}" \
+         --locations "{{ sat_loc }}"
+  register: result
+  with_items:
+    - "{{ subnets }}"
+  changed_when:
+    - result.rc == 0  #gets enabled
+  failed_when:
+    - ( result.rc == 65 and "Name has already been taken" not in result.stderr ) or ( result.rc != 65 and result.rc != 0 )
+  tags:
+    - subnets
