@@ -13,3 +13,4 @@
 - import_tasks: configure_idmrealm_setup.yml
 - import_tasks: configure_idmdns_setup.yml
 - import_tasks: configure_idmauth_setup.yml
+- import_tasks: configure_puppet.yml

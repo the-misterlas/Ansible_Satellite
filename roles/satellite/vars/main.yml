@@ -229,3 +229,8 @@ provisioning:
  
 activation_keys:
 #auto-generated based off of CV and Lifecycle
+
+puppet_vars:
+  autosign_rules:
+    - *.example.com
+    - *.example2.com

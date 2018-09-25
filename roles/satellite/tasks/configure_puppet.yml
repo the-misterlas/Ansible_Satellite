@@ -1,0 +1,10 @@
+---
+- name: Configure Puppet autosigning rules
+  lineinfile:
+    dest: /etc/puppet/autosign.conf
+    line: "{{ item }}"
+  with_items:
+    - "{{ puppet_vars.autosign_rules }}"
+  tags:
+    - puppet
+    - autosign
