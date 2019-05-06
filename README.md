@@ -5,6 +5,7 @@ Steps to run:
   - Build RHEL 7.x (latest) host
   - Register with Red Hat Customer Portal
   - Attach Satellite entitlement
+  - Create and download manifest.  Download to: roles/satellite/files/satellite_manifest.zip
   - Add a disk of 200GB (or more/less, but be sure to adjust volume values in vars file)
   - Adjust roles/satellite/vars/main.yml to fit your needs and environment
   - Run playbook
