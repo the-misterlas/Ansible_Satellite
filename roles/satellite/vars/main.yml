@@ -91,18 +91,24 @@ install_log_dir: /root/satellite-install
 enable_repos: true
 
 #6.3
-satellite_repos: 
-  - rhel-7-server-rpms
-  - rhel-7-server-satellite-6.3-rpms
-  - rhel-server-rhscl-7-rpms
-
-#6.4 beta:
-#satellite_repos:
+#satellite_repos: 
 #  - rhel-7-server-rpms
+#  - rhel-7-server-satellite-6.3-rpms
 #  - rhel-server-rhscl-7-rpms
-#  - rhel-server-7-satellite-6-beta-rpms
-#  - rhel-7-server-satellite-maintenance-6-beta-rpms
-#  - rhel-7-server-ansible-2.6-rpms
+
+#6.4:
+satellite_repos:
+  - rhel-7-server-rpms 
+  - rhel-server-rhscl-7-rpms 
+  - rhel-7-server-satellite-6.4-rpms 
+  - rhel-7-server-satellite-maintenance-6-rpms 
+  - rhel-7-server-ansible-2.6-rpms
+
+#6.5
+#satellite_repos: 
+#  - rhel-7-server-rpms
+#  - rhel-7-server-satellite-6.3-rpms
+#  - rhel-server-rhscl-7-rpms
 
 #sync values might need increased depending upon connection
 sync_plan:
