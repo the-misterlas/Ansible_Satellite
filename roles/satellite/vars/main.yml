@@ -136,11 +136,11 @@ pulp_content:
     basearch: "x86_64"
     releasever: "7Server"
   - product: "Red Hat Enterprise Linux Server"
-    name: "Red Hat Satellite Tools 6.3 (for RHEL 7 Server) (RPMs)"
+    name: "Red Hat Satellite Tools 6.4 (for RHEL 7 Server) (RPMs)"
     basearch: "x86_64"
-  - product: "Red Hat Enterprise Linux Server"
-    name: "Red Hat Satellite Tools 6.3 - Puppet 4 (for RHEL 7 Server) (RPMs)"
-    basearch: "x86_64"
+#  - product: "Red Hat Enterprise Linux Server"
+#    name: "Red Hat Satellite Tools 6.4 - Puppet 4 (for RHEL 7 Server) (RPMs)"
+#    basearch: "x86_64"
   - product: "Red Hat Enterprise Linux Server"
     name: "Red Hat Storage Native Client for RHEL 7 (RPMs)"
     basearch: "x86_64"
@@ -148,7 +148,7 @@ pulp_content:
   - product: "Red Hat Enterprise Linux Server"
     name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
     basearch:  "x86_64"
-    releasever:  "7.5"
+    releasever:  "7.6"
   #RHV 4.2
   - product: "Red Hat Enterprise Linux Server"
     name: "Red Hat Enterprise Linux 7 Server (RPMs)"
@@ -170,17 +170,17 @@ pulp_content:
   - product: "Red Hat Ansible Engine"
     name: "Red Hat Ansible Engine 2 RPMs for Red Hat Enterprise Linux 7 Server"
     basearch: "x86_64"
-  #OCP 3.9
-  - product: "Red Hat OpenShift Container Platform"
-    name: "Red Hat OpenShift Container Platform 3.9 (RPMs)"
-    basearch: "x86_64"
-  - product: "Red Hat Enterprise Linux Fast Datapath"
-    name: "Red Hat Enterprise Linux Fast Datapath (RHEL 7 Server) (RPMs)"
-    basearch: "x86_64"
-    releasever: "7Server"
-  - product: "Red Hat Ansible Engine"
-    name: "Red Hat Ansible Engine 2.4 RPMs for Red Hat Enterprise Linux 7 Server"
-    basearch: "x86_64"
+#  #OCP 3.9
+#  - product: "Red Hat OpenShift Container Platform"
+#    name: "Red Hat OpenShift Container Platform 3.9 (RPMs)"
+#    basearch: "x86_64"
+#  - product: "Red Hat Enterprise Linux Fast Datapath"
+#    name: "Red Hat Enterprise Linux Fast Datapath (RHEL 7 Server) (RPMs)"
+#    basearch: "x86_64"
+#    releasever: "7Server"
+#  - product: "Red Hat Ansible Engine"
+#    name: "Red Hat Ansible Engine 2.4 RPMs for Red Hat Enterprise Linux 7 Server"
+#    basearch: "x86_64"
  
 content_views:
   - cv_name: "RHEL-CV"
@@ -188,8 +188,8 @@ content_views:
     repos:
       - "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
       - "Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.5"
-      - "Red Hat Satellite Tools 6.3 for RHEL 7 Server RPMs x86_64"
-      - "Red Hat Satellite Tools 6.3 - Puppet 4 for RHEL 7 Server RPMs x86_64"
+      - "Red Hat Satellite Tools 6.4 for RHEL 7 Server RPMs x86_64"
+      - "Red Hat Satellite Tools 6.4 - Puppet 4 for RHEL 7 Server RPMs x86_64"
       - "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
       - "Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server"
       - "Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server"
@@ -207,16 +207,16 @@ content_views:
     cv_label: "RHVH-CV"
     repos:
       - "Red Hat Virtualization Host 7 RPMs x86_64"
-  - cv_name: "OCP-CV"
-    cv_label: "OCP-CV"
-    repos:
-      - "Red Hat OpenShift Container Platform 3.9 RPMs x86_64"
-      - "Red Hat Enterprise Linux Fast Datapath RHEL 7 Server RPMs x86_64 7Server"
-      - "Red Hat Ansible Engine 2.4 RPMs for Red Hat Enterprise Linux 7 Server x86_64"
-      - "Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server"
-      - "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
-      - "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
-      - "Red Hat Satellite Tools 6.3 for RHEL 7 Server RPMs x86_64"
+#  - cv_name: "OCP-CV"
+#    cv_label: "OCP-CV"
+#    repos:
+#      - "Red Hat OpenShift Container Platform 3.9 RPMs x86_64"
+#      - "Red Hat Enterprise Linux Fast Datapath RHEL 7 Server RPMs x86_64 7Server"
+#      - "Red Hat Ansible Engine 2.4 RPMs for Red Hat Enterprise Linux 7 Server x86_64"
+#      - "Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server"
+#      - "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
+#      - "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
+#      - "Red Hat Satellite Tools 6.4 for RHEL 7 Server RPMs x86_64"
  
 lifecycle_envs:
   # Library > Development > Testing > Production
@@ -231,7 +231,7 @@ lifecycle_envs:
     prior: TEST
  
 provisioning:
-  default_os_ver_ks: "7.5"
+  default_os_ver_ks: "7.6"
  
 activation_keys:
 #auto-generated based off of CV and Lifecycle
@@ -257,10 +257,10 @@ hostgroups:
     - name: "OCP"
     - name: "RHV"
   level_two:
-    - name: "Development"
-      parent: "OCP"
-    - name: "Production"
-      parent: "OCP"
+#    - name: "Development"
+#      parent: "OCP"
+#    - name: "Production"
+#      parent: "OCP"
     - name: "Development"
       parent: "RHEL"
     - name: "Production"
