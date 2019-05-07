@@ -24,7 +24,7 @@ Ansible playbooks to build my home lab environment
   - Click "Subscription Allocations"  
   - Select "New Subscription Allocation"  
   - Enter name: "Satellite"  
-  - Select Type:  "6.3"  
+  - Select Type:  "6.4"  
   - Click "Create"  
   - Click "Subscriptions" and add the subscriptions and number of subscriptions to include in the manifest.  
   - Select "Submit"   
@@ -32,7 +32,7 @@ Ansible playbooks to build my home lab environment
   - Name the file "satellite_manifest.zip" and download it to the roles/satellite/files/ folder  
   
 # Roles:  
-  satellite - Install Satellite 6.3.x   
+  satellite - Install Satellite 6.4.x   
 
 # Minimum System Requirements for roles:  
  - satellite
