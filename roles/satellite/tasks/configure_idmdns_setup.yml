@@ -3,7 +3,9 @@
   yum:
     name: ipa-client
     state: latest
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
@@ -15,7 +17,9 @@
           --domain "{{ idm_vars.idm_domain }}" \
           --principal "{{ idm_vars.idm_principal }}" \
           --password "{{ idm_vars.idm_password }}"
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   register: result
   failed_when: 
     - ( result.rc != 3 and result.rc != 0 )
@@ -31,27 +35,36 @@
           -k /etc/foreman-proxy/dns.keytab
   args: 
     chdir: /etc/foreman-proxy/
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 - shell: chown foreman-proxy:foreman-proxy /etc/foreman-proxy/dns.keytab
   args:
     chdir: /etc/foreman-proxy/
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 - shell: kinit -kt /etc/foreman-proxy/dns.keytab capsule/{{ ansible_fqdn }}@{{ ansible_domain|upper }}
   args:
     chdir: /etc/foreman-proxy/
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 - name: Verify if HTTP Service in IdM for Satellite exists
   shell: echo "{{ idm_vars.idm_password }}" | kinit admin;
          /usr/bin/ipa service-find HTTP/{{ ansible_fqdn }}
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   register: result
   failed_when:
     - ( result.rc != 1 and result.rc != 0 )
@@ -62,12 +75,18 @@
 - name: Add HTTP Service to in Idm for Satellite
   shell: echo "{{ idm_vars.idm_password }}" | kinit admin;
          /usr/bin/ipa service-add HTTP/{{ ansible_fqdn }}
-  when: result.rc != 0
+  when: 
+    - result.rc != 0
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 - name: Verify 'satellite-admin' group to idm
   command: /usr/bin/ipa group-find satellite-admin
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   register: result
   changed_when: False
   failed_when:
@@ -77,13 +96,19 @@
 
 - name: Create 'satellite-admin' group in IdM
   shell: /usr/bin/ipa group-add satellite-admin
-  when: result is failed
+  when: 
+    - result is failed
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 - name: Verify hbac service in IdM
   shell: /usr/bin/ipa hbacsvc-find satellite-prod
   register: result
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   changed_when: False
   failed_when:
     - ( result.rc != 1 and result.rc != 0 )
@@ -92,12 +117,18 @@
 
 - name: Create hbac service in IdM
   shell: /usr/bin/ipa hbacsvc-add satellite-prod
-  when: result.rc != 0
+  when: 
+    - result.rc != 0
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 - name: Verify hbac rule in IdM
   shell: /usr/bin/ipa hbacrule-find allow_satellite_prod
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   register: result
   changed_when: False
   failed_when:
@@ -110,14 +141,17 @@
          /usr/bin/ipa hbacrule-add-service allow_satellite_prod --hbacsvcs=satellite-prod;
          /usr/bin/ipa hbacrule-add-user allow_satellite_prod --groups=satellite-admin;
          /usr/bin/ipa hbacrule-add-host allow_satellite_prod --hosts={{ ansible_fqdn }};
-  when: result.rc != 0
+  when: 
+    - result.rc != 0
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
 
 #
 # add to forward and reverse zones "BIND update policy" in IdM
-# grant capsule\satellite-server-1.us.lmco.com@ORL.LMCO.COM wildcard * ANY;
+# grant capsule\satellite.fqdn@DOMAIN.TLD wildcard * ANY;
 # on forward zone, enable 'Allow PTR Sync'
 # on both zones, enable dynamic updates
 #
@@ -134,7 +168,9 @@
          --foreman-proxy-dns-reverse "{{ dns_vars.dns_reverse }}" \
          --foreman-proxy-dns-zone "{{ dns_vars.dns_zone }}" \
          --foreman-proxy-dns-ttl 86400
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
 
@@ -142,6 +178,8 @@
   service:
     name: foreman-proxy
     state: restarted
-  when: idm_dns_setup and dns_proxy
+  when: 
+    - idm_dns_setup  
+    - dns_proxy
   tags:
     - idmdns
