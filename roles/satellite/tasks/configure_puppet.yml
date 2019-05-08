@@ -3,6 +3,8 @@
   lineinfile:
     dest: "{{ puppet_vars.dir }}/autosign.conf"
     line: "{{ item }}"
+  when:
+    - puppet_autosign_setup
   with_items:
     - "{{ puppet_vars.autosign_rules }}"
   tags:
