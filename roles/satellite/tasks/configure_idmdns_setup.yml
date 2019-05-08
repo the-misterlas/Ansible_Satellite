@@ -76,7 +76,8 @@
   shell: echo "{{ idm_vars.idm_password }}" | kinit admin;
          /usr/bin/ipa service-add HTTP/{{ ansible_fqdn }}
   when: 
-    - (result.rc != 0 and idm_dns_setup and dns_proxy)
+    - idm_dns_setup 
+    - dns_proxy
   tags:
     - idmdns
 
@@ -116,7 +117,8 @@
 - name: Create hbac service in IdM
   shell: /usr/bin/ipa hbacsvc-add satellite-prod
   when: 
-    - (result.rc != 0 and idm_dns_setup and dns_proxy)
+    - (result.rc is defined and result.rc != 0) 
+    - idm_dns_setup and dns_proxy
   tags:
     - idmdns
 
@@ -138,7 +140,8 @@
          /usr/bin/ipa hbacrule-add-user allow_satellite_prod --groups=satellite-admin;
          /usr/bin/ipa hbacrule-add-host allow_satellite_prod --hosts={{ ansible_fqdn }};
   when: 
-    - (result.rc != 0 and idm_dns_setup and dns_proxy)
+    - idm_dns_setup 
+    - dns_proxy
   tags:
     - idmdns
 
