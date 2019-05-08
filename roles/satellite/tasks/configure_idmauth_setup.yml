@@ -51,12 +51,15 @@
   tags:
     - idmauth
 
-- command: /usr/bin/ipa group-add sat-admins
+- block:
+    - name: Create sat-admins group within idm
+      command: /usr/bin/ipa group-add sat-admins
+      when: 
+        - sat_admins_idm is failed
+      tags:
+        - idmauth
   when: 
-    - sat_admins_idm is failed
     - idm_auth_setup
-  tags:
-    - idmauth
 
 - name: CONFIGURE SATELLITE IDM | Add satellite users group to idm
   command: /usr/bin/ipa group-find sat-users
@@ -69,12 +72,15 @@
   tags:
     - idmauth
 
-- command: /usr/bin/ipa group-add sat-users
+- block:
+    - name: Create sat-users group within idm
+      command: /usr/bin/ipa group-add sat-users
+      when: 
+        - sat_users_idm is failed
+      tags:
+        - idmauth
   when: 
-    - sat_users_idm is failed
     - idm_auth_setup
-  tags:
-    - idmauth
 
 - name: Check for ldap auth source in Satellite if not there create it
   shell: hammer --csv auth-source ldap list --search  | grep -v "Id"| cut -d, -f1
@@ -85,28 +91,30 @@
   tags:
     - idmauth
 
-- name: CONFIGURE SATELLITE IDM | Configure satellite to use external IDM for auth
-  command: >
-           /usr/bin/hammer auth-source ldap create --name {{ idm_auth_vars.ldap_server }} \
-           --account "{{ idm_auth_vars.ldap_user }}" \
-           --account-password "{{ idm_auth_vars.ldap_password }}" \
-           --attr-firstname givenName \
-           --attr-lastname sn \
-           --attr-login uid \
-           --attr-mail mail \
-           --base-dn {{ idm_auth_vars.ldap_base_dn }} \
-           --groups-base {{ idm_auth_vars.ldap_groups_base_dn }} \
-           --host {{ idm_auth_vars.ldap_server }} \
-           --port 389 \
-           --server-type posix \
-           --locations {{ sat_loc }} \
-           --organizations {{ sat_org }} \
-           --onthefly-register yes
+- block:
+    - name: CONFIGURE SATELLITE IDM | Configure satellite to use external IDM for auth
+      command: >
+               /usr/bin/hammer auth-source ldap create --name {{ idm_auth_vars.ldap_server }} \
+               --account "{{ idm_auth_vars.ldap_user }}" \
+               --account-password "{{ idm_auth_vars.ldap_password }}" \
+               --attr-firstname givenName \
+               --attr-lastname sn \
+               --attr-login uid \
+               --attr-mail mail \
+               --base-dn {{ idm_auth_vars.ldap_base_dn }} \
+               --groups-base {{ idm_auth_vars.ldap_groups_base_dn }} \
+               --host {{ idm_auth_vars.ldap_server }} \
+               --port 389 \
+               --server-type posix \
+               --locations {{ sat_loc }} \
+               --organizations {{ sat_org }} \
+               --onthefly-register yes
+      when: 
+        - ldap_auth_present.stdout == ""
+      tags:
+        - idmauth
   when: 
-    - ldap_auth_present.stdout == ""
     - idm_auth_setup
-  tags:
-    - idmauth
 
 - name: Register ldap_auth id number
   shell: /usr/bin/hammer --csv auth-source ldap --search | grep -v "Id" | cut -d, -f1
@@ -125,75 +133,68 @@
   tags:
     - idmauth
 
-- command: /usr/bin/hammer user-group create --name sat-users
-  when: 
-    - "'sat-users' not in sat_users_hammer.stdout"
-    - idm_auth_setup
-  tags:
-    - idmauth
+- block:
+    - name: Create sat-users within Satellite
+      command: /usr/bin/hammer user-group create --name sat-users
+      when: 
+        - "'sat-users' not in sat_users_hammer.stdout"
+      tags:
+        - idmauth
 
-- command: /usr/bin/hammer user-group update --name sat-users --roles Viewer
-  when: 
-    - "'sat-users' not in sat_users_hammer.stdout"
-    - idm_auth_setup
-  tags:
-    - idmauth
+    - name: Add Viewer role to sat-users group
+      command: /usr/bin/hammer user-group update --name sat-users --roles Viewer
+      when: 
+        - "'sat-users' not in sat_users_hammer.stdout"
+      tags:
+        - idmauth
 
-- name: Check for satellite user group sat-admins if not there create it.
-  shell: hammer --csv user-group list --search sat-admins
-  when: 
-    - idm_auth_setup
-  register: sat_admins_hammer
-  changed_when: False
-  tags:
-    - idmauth
+    - name: Check for satellite user group sat-admins if not there create it.
+      shell: hammer --csv user-group list --search sat-admins
+      register: sat_admins_hammer
+      changed_when: False
+      tags:
+        - idmauth
+    
+    - command: /usr/bin/hammer user-group create --name sat-admins
+      when: 
+        - "'sat-admins' not in sat_admins_hammer.stdout"
+      tags:
+        - idmauth
+    
+    - command: /usr/bin/hammer user-group update --name sat-admins --admin yes
+      when: 
+        - "'sat-admins' not in sat_admins_hammer.stdout"
+      tags:
+        - idmauth
 
-- command: /usr/bin/hammer user-group create --name sat-admins
-  when: 
-    - "'sat-admins' not in sat_admins_hammer.stdout"
-    - idm_auth_setup
-  tags:
-    - idmauth
+    - name: Check if external group link for sat-users exists
+      command: hammer --csv user-group external list --user-group sat-users
+      register: external_group_users
+      failed_when:
+        - external_group_users.rc != 0
+      changed_when: False
+      tags:
+        - idmauth
 
-- command: /usr/bin/hammer user-group update --name sat-admins --admin yes
-  when: 
-    - "'sat-admins' not in sat_admins_hammer.stdout"
-    - idm_auth_setup
-  tags:
-    - idmauth
+    - shell: /usr/bin/hammer user-group external create --name sat-users --user-group sat-users --auth-source-id {{ auth_id_src.stdout }}
+      when: 
+        - external_group_users.rc == 70
+      tags:
+        - idmauth
 
-- name: Check if external group link for sat-users exists
-  command: hammer --csv user-group external list --user-group sat-users
-  when: 
-    - idm_auth_setup
-  register: external_group_users
-  failed_when:
-    - external_group_users.rc != 0
-  changed_when: False
-  tags:
-    - idmauth
+    - name: Check if external group link for sat-admins exists
+      command: hammer --csv user-group external list --user-group sat-admins
+      register: external_group_admins
+      failed_when:
+        - external_group_users.rc != 0
+      changed_when: False
+      tags:
+        - idmauth
 
-- shell: /usr/bin/hammer user-group external create --name sat-users --user-group sat-users --auth-source-id {{ auth_id_src.stdout }}
-  when: 
-    - external_group_users.rc == 70
+    - shell: /usr/bin/hammer user-group external create --name sat-admins --user-group sat-admins --auth-source-id {{ auth_id_src.stdout }}
+      when: 
+        - external_group_admins.rc == 70
+      tags:
+        - idmauth
+  when:
     - idm_auth_setup
-  tags:
-    - idmauth
-
-- name: Check if external group link for sat-admins exists
-  command: hammer --csv user-group external list --user-group sat-admins
-  when: 
-    - idm_auth_setup
-  register: external_group_admins
-  failed_when:
-    - external_group_users.rc != 0
-  changed_when: False
-  tags:
-    - idmauth
-
-- shell: /usr/bin/hammer user-group external create --name sat-admins --user-group sat-admins --auth-source-id {{ auth_id_src.stdout }}
-  when: 
-    - external_group_admins.rc == 70
-    - idm_auth_setup
-  tags:
-    - idmauth

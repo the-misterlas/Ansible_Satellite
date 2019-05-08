@@ -239,6 +239,8 @@ activation_keys:
 #auto-generated based off of CV and Lifecycle
 
 puppet_vars:
+  dir: "/etc/puppetlabs/puppet" ##Puppet 4+
+# dir: "/etc/puppetlabs/puppet" ##Puppet 3 and older
   autosign_rules:
     - "*.example.com"
     - "*.example2.com"
