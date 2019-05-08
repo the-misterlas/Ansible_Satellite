@@ -19,6 +19,7 @@
     vg: "{{ content_vgname }}"
     lv: "{{ item.name }}"
     size: "{{ item.size }}"
+    force: "{{ item.force }}"
   when: create and config_lvm
   with_items:
     - "{{ content_lvs }}"

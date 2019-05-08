@@ -15,6 +15,7 @@
           --domain "{{ idm_vars.idm_domain }}" \
           --principal "{{ idm_vars.idm_principal }}" \
           --password "{{ idm_vars.idm_password }}"
+  when: idm_dns_setup and dns_proxy
   register: result
   failed_when: 
     - ( result.rc != 3 and result.rc != 0 )
