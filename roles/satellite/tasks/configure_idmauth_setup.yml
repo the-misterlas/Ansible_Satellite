@@ -129,7 +129,6 @@
   when: 
     - "'sat-users' not in sat_users_hammer.stdout"
     - idm_auth_setup
-  when: idm_auth_setup
   tags:
     - idmauth
 
@@ -137,7 +136,6 @@
   when: 
     - "'sat-users' not in sat_users_hammer.stdout"
     - idm_auth_setup
-  when: idm_auth_setup
   tags:
     - idmauth
 
