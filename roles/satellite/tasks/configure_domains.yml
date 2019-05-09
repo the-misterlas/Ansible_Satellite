@@ -1,5 +1,5 @@
 ---
-- name: Associate domain with organization
+- name: configure_domains | Associate domain with organization
   shell: /usr/bin/hammer domain create \
          --name "{{ ansible_domain }}" \
          --organizations "{{ sat_org }}" \

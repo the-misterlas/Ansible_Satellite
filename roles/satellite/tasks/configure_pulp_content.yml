@@ -1,10 +1,10 @@
 ---
-- name: Set default sync policy to {{ default_download_policy }}
+- name: configure_pulp_content | Set default sync policy to {{ default_download_policy }}
   command: /usr/bin/hammer settings set \
            --name default_download_policy \
            --value "{{ default_download_policy }}"
 
-- name: Configure repositories to be synced
+- name: configure_pulp_content | Configure repositories to be synced
   command: /usr/bin/hammer repository-set enable \
            --organization "{{ sat_org }}" \
            --product "{{ item.product }}" \
@@ -22,7 +22,7 @@
     - content
     - repos
 
-- name: Create unique list of products
+- name: configure_pulp_content | Create unique list of products
   shell: /usr/bin/hammer --csv product list \
          --enabled true \
          --organization "{{ sat_org }}" | sed -n '1!p' | cut -d, -f2
@@ -32,7 +32,7 @@
     - sync
     - syncplan
 
-- name: Print list
+- name: configure_pulp_content | Print list
   debug:
     msg: "{{ products_to_sync }}"
   tags:
@@ -40,7 +40,7 @@
     - sync
     - syncplan
 
-- name: Sync products
+- name: configure_pulp_content | Sync products
   command: /usr/bin/hammer product synchronize \
            --organization "{{ sat_org }}" \
            --name "{{ item }}" \
@@ -51,7 +51,7 @@
     - content
     - sync
 
-- name: Wait for products to sync
+- name: configure_pulp_content | Wait for products to sync
   shell: for status in $(hammer --csv repository list | grep -v Id | cut -d, -f1); \
          do \
            hammer repository info \
@@ -69,7 +69,7 @@
     - sync
     - synctest
 
-- name: Create Sync Plan
+- name: configure_pulp_content | Create Sync Plan
   command: /usr/bin/hammer sync-plan create \
            --organization "{{ sat_org }}" \
            --enabled true \
@@ -86,7 +86,7 @@
     - sync
     - syncplan
 
-- name: Assign products to sync-plan
+- name: configure_pulp_content | Assign products to sync-plan
   command: /usr/bin/hammer product set-sync-plan \
            --organization "{{ sat_org }}" \
            --name "{{ item }}" \

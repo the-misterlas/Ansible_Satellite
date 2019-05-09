@@ -1,5 +1,5 @@
 ---
-- name: SATELLITE | upload_manifest | Copy mainfiest file to Satellite server
+- name: install_manifest | Copy mainfiest file to Satellite server
   copy:
     src: "{{ manifest_file }}"
     dest: /root/satellite_manifest.zip
@@ -10,7 +10,7 @@
     - install
     - manifest
 
-- name: SATELLITE | upload_manifest | Upload manifest to Satellite server
+- name: install_manifest | Upload manifest to Satellite server
   command: /usr/bin/hammer subscription upload \
            --organization "{{ sat_org }}" \
            --file /root/satellite_manifest.zip \

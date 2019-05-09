@@ -11,7 +11,7 @@
 - import_tasks: configure_subnets.yml
 - import_tasks: configure_hostgroups.yml
 - import_tasks: configure_provisioning.yml
-- import_tasks: configure_activationkeys.yml
+- import_tasks: configure_activation_keys.yml
 - import_tasks: configure_idmrealm_setup.yml
 - import_tasks: configure_idmdns_setup.yml
 - import_tasks: configure_idmauth_setup.yml

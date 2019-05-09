@@ -1,5 +1,5 @@
 ---
-- name: Configuring Firewall for Satellite Communication
+- name: configure_firewall | Enable firewalld
   service:
     state: started
     enabled: yes
@@ -7,7 +7,8 @@
   tags:
     - firewall
 
-- firewalld:
+- name: configure_firewall | Configuring firewalld services
+  firewalld:
     service: "{{ item }}"
     permanent: true
     state: enabled
@@ -20,7 +21,7 @@
   tags:
     - firewall
 
-- name: Open firewall port for ocp container registry
+- name: configure_firewall | Open firewall port for ocp container registry
   firewalld:
     port: 5000/tcp
     permanent: true
@@ -29,7 +30,7 @@
   tags:
     - firewall
 
-- name: Restart firewalld
+- name: configure_firewall | Restart firewalld
   service:
     name: firewalld
     state: restarted

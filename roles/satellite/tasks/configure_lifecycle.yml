@@ -1,5 +1,5 @@
 ---
-- name: Create Life Cycle Environments
+- name: configure_lifecycle | Create Life Cycle Environments
   shell: /usr/bin/hammer lifecycle-environment create \
          --name "{{ item.name }}" \
          --label "{{ item.label }}" \

@@ -1,5 +1,5 @@
 ---
-- name: Ensure /root/post-install-setup directory exists
+- name: configure_provisioning | Ensure /root/post-install-setup directory exists
   file:
     path: /root/post-install-setup/{{ item }}
     state: directory
@@ -11,27 +11,27 @@
     - provisioning
 
 # Upload and set STIG partition table and kickstart
-- name: Upload STIG Partition table
+- name: configure_provisioning | Upload STIG Partition table
   copy:
     src: part-stig.erb
     dest: /root/post-install-setup/templates/part-stig.erb
   tags:
     - provisioning
 
-- name: Upload default STIG Kickstart
+- name: configure_provisioning | Upload default STIG Kickstart
   copy:
     src: kickstart-stig.erb
     dest: /root/post-install-setup/templates/kickstart-stig.erb
   tags:
     - provisioning
 
-- name: Determine the os id for RedHat {{ provisioning.default_os_ver_ks }}
+- name: configure_provisioning | Determine the os id for RedHat {{ provisioning.default_os_ver_ks }}
   shell: /usr/bin/hammer os list --search "RedHat {{ provisioning.default_os_ver_ks }}" | awk ' /RedHat/ { print $1 }'
   register: os_id
   tags:
     - provisioning
 
-- name: Upload the partition template and attach to the OS
+- name: configure_provisioning | Upload the partition template and attach to the OS
   shell: /usr/bin/hammer partition-table create \
          --file /root/post-install-setup/templates/kickstart-stig.erb \
          --locations "{{ sat_loc }}" \
@@ -49,14 +49,14 @@
   tags:
     - provisioning
 
-- name: Remove Satellite default partition tables
+- name: configure_provisioning | Remove Satellite default partition tables
   shell: /usr/bin/hammer os remove-ptable \
          --partition-table "Kickstart default" \
          --id "{{ os_id.stdout }}"
   tags:
     - provisioning
 
-- name: Create Provisioning Template from file
+- name: configure_provisioning | Create Provisioning Template from file
   shell: /usr/bin/hammer template create \
          --file /root/post-install-setup/templates/kickstart-stig.erb \
          --locations "{{ sat_loc }}" \
@@ -74,13 +74,13 @@
   tags:
     - provisioning
 
-- name: Determine kickstart id
+- name: configure_provisioning | Determine kickstart id
   shell: /usr/bin/hammer template list | awk ' /STIG/ { print $1 }'
   register: ks_id
   tags:
     - provisioning
 
-- name: Set Default STIG kickstart for os
+- name: configure_provisioning | Set Default STIG kickstart for os
   shell: /usr/bin/hammer os set-default-template \
          --config-template-id "{{ ks_id.stdout }}" \
          --id "{{ os_id.stdout }}"

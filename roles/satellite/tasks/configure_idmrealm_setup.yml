@@ -1,5 +1,5 @@
 ---
-- name: Ensure required packages are on latest
+- name: configure_idmrealm_setup | Ensure required packages are on latest
   yum:
     name: "{{ item }}"
     state: latest
@@ -11,7 +11,7 @@
   tags:
     - idmrealm
 
-- name: Configure IdM client
+- name: configure_idmrealm_setup | Configure IdM client
   shell: /usr/sbin/ipa-client-install -U \
           --hostname "{{ ansible_fqdn }}" \
           --server "{{ idm_vars.idm_server }}" \
@@ -26,7 +26,7 @@
   tags:
     - idmrealm
  
-- name: Run foreman realm prepare to configure capsule
+- name: configure_idmrealm_setup | Run foreman realm prepare to configure capsule
   shell: echo "{{ idm_vars.idm_password }}" | /usr/sbin/foreman-prepare-realm admin realm-capsule
   args:
     chdir: /root
@@ -34,13 +34,13 @@
   tags:
     - idmrealm
 
-- name: Copy keytab in place
+- name: configure_idmrealm_setup | Copy keytab in place
   shell: mv /root/freeipa.keytab /etc/foreman-proxy
   when: idm_realm_setup
   tags:
     - idmrealm
 
-- name: Configure ownership of keytab
+- name: configure_idmrealm_setup | Configure ownership of keytab
   shell: chown foreman-proxy:foreman-proxy /etc/foreman-proxy/freeipa.keytab
   args:
     chdir: /etc/foreman-proxy/
@@ -48,7 +48,7 @@
   tags:
     - idmrealm
 
-- name: Run foreman installer to configure capsule
+- name: configure_idmrealm_setup | Run foreman installer to configure capsule
   shell: satellite-installer --scenario satellite \
          --foreman-proxy-realm true \
          --foreman-proxy-realm-keytab /etc/foreman-proxy/freeipa.keytab \
@@ -58,7 +58,7 @@
   tags:
     - idmrealm
 
-- name: Restart foreman proxy service
+- name: configure_idmrealm_setup | Restart foreman proxy service
   service:
     name: foreman-proxy
     state: restarted

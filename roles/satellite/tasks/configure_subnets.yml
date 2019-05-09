@@ -1,5 +1,5 @@
 ---
-- name: Create subnet
+- name: configure_subnets | Create subnet
   shell: /usr/bin/hammer subnet create \
          --name "{{ item.name }}" \
          --network "{{ item.network }}" \
@@ -16,7 +16,7 @@
   tags:
     - subnets
 
-- name: Configure subnets
+- name: configure_subnets | Configure subnets
   shell: /usr/bin/hammer subnet update \
          --name "{{ item.name }}" \
          --network "{{ item.network }}" \

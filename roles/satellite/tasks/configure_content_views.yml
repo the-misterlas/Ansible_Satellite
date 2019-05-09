@@ -1,5 +1,5 @@
 ---
-- name: Create Content Views
+- name: configure_content_views | Create Content Views
   shell: /usr/bin/hammer content-view create --name "{{ item.cv_name }}" \
          --label "{{ item.cv_label }}" \
          --organization "{{ sat_org }}" \
@@ -15,7 +15,7 @@
     - content
     - content_views
 
-- name: Add repositories to Content Views
+- name: configure_content_views | Add repositories to Content Views
   shell: /usr/bin/hammer content-view update --name "{{ item.cv_name }}" \
          --organization "{{ sat_org }}" \
          --repositories {% for repo in item.repos %}"{{ repo }}",{% endfor %}
@@ -31,7 +31,7 @@
     - content
     - content_views
 
-- name: Publish all Content Views into Library
+- name: configure_content_views | Publish all Content Views into Library
   shell: /usr/bin/hammer content-view publish \
          --name "{{ item.cv_name }}" \
          --organization "{{ sat_org }}" \
@@ -44,7 +44,7 @@
     - content_views
     - publish
 
-- name: Promote all Content Views to all Lifecycle Environments
+- name: configure_content_views | Promote all Content Views to all Lifecycle Environments
   shell: /usr/bin/hammer content-view version promote \
          --content-view "{{ item[0].cv_name }}" \
          --from-lifecycle-environment "{{ item[1].prior }}" \

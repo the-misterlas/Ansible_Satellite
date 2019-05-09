@@ -1,5 +1,5 @@
 ---
-- name: Ensure ipa-client is on latest
+- name: configure_idmdns_setup | Ensure ipa-client is on latest
   yum:
     name: ipa-client
     state: latest
@@ -9,7 +9,7 @@
   tags:
     - idmdns
 
-- name: Configure IdM client
+- name: configure_idmdns_setup | Configure IdM client
   shell: /usr/sbin/ipa-client-install -U \
           --hostname "{{ ansible_fqdn }}" \
           --server "{{ idm_vars.idm_server }}" \
@@ -26,7 +26,7 @@
   tags:
     - idmdns
  
-- name: Configure DNS proxy
+- name: configure_idmdns_setup | Configure DNS proxy
   shell: echo "{{ idm_vars.idm_password }}" | kinit admin;
          /usr/bin/ipa service-add capsule/{{ ansible_fqdn }};
          /usr/sbin/ipa-getkeytab \
@@ -41,7 +41,8 @@
   tags:
     - idmdns
 
-- shell: chown foreman-proxy:foreman-proxy /etc/foreman-proxy/dns.keytab
+- name: configure_idmdns_setup | Correct permissions on dns.keytab
+  shell: chown foreman-proxy:foreman-proxy /etc/foreman-proxy/dns.keytab
   args:
     chdir: /etc/foreman-proxy/
   when: 
@@ -50,7 +51,8 @@
   tags:
     - idmdns
 
-- shell: kinit -kt /etc/foreman-proxy/dns.keytab capsule/{{ ansible_fqdn }}@{{ ansible_domain|upper }}
+- name: configure_idmdns_setup | Configure DNS updates
+  shell: kinit -kt /etc/foreman-proxy/dns.keytab capsule/{{ ansible_fqdn }}@{{ ansible_domain|upper }}
   args:
     chdir: /etc/foreman-proxy/
   when: 
@@ -59,7 +61,7 @@
   tags:
     - idmdns
 
-- name: Verify if HTTP Service in IdM for Satellite exists
+- name: configure_idmdns_setup | Verify if HTTP Service in IdM for Satellite exists
   shell: echo "{{ idm_vars.idm_password }}" | kinit admin;
          /usr/bin/ipa service-find HTTP/{{ ansible_fqdn }}
   when: 
@@ -72,7 +74,7 @@
   tags:
     - idmdns
 
-- name: Add HTTP Service to in Idm for Satellite
+- name: configure_idmdns_setup | Add HTTP Service to in Idm for Satellite
   shell: echo "{{ idm_vars.idm_password }}" | kinit admin;
          /usr/bin/ipa service-add HTTP/{{ ansible_fqdn }}
   when: 
@@ -81,7 +83,7 @@
   tags:
     - idmdns
 
-- name: Verify 'satellite-admin' group to idm
+- name: configure_idmdns_setup | Verify 'satellite-admin' group to idm
   command: /usr/bin/ipa group-find satellite-admin
   when: 
     - idm_dns_setup  
@@ -93,7 +95,7 @@
   tags:
     - idmdns
 
-- name: Create 'satellite-admin' group in IdM
+- name: configure_idmdns_setup | Create 'satellite-admin' group in IdM
   shell: /usr/bin/ipa group-add satellite-admin
   when: 
     - result is failed
@@ -102,7 +104,7 @@
   tags:
     - idmdns
 
-- name: Verify hbac service in IdM
+- name: configure_idmdns_setup | Verify hbac service in IdM
   shell: /usr/bin/ipa hbacsvc-find satellite-prod
   register: result
   when: 
@@ -114,7 +116,7 @@
   tags:
     - idmdns
 
-- name: Create hbac service in IdM
+- name: configure_idmdns_setup | Create hbac service in IdM
   shell: /usr/bin/ipa hbacsvc-add satellite-prod
   when: 
     - (result.rc is defined and result.rc != 0) 
@@ -122,7 +124,7 @@
   tags:
     - idmdns
 
-- name: Verify hbac rule in IdM
+- name: configure_idmdns_setup | Verify hbac rule in IdM
   shell: /usr/bin/ipa hbacrule-find allow_satellite_prod
   when: 
     - idm_dns_setup  
@@ -134,7 +136,8 @@
   tags:
     - idmdns
 
-- shell: |
+- name: configure_idmdns_setup | Add hbac rules
+  shell: |
          /usr/bin/ipa hbacrule-add allow_satellite_prod;
          /usr/bin/ipa hbacrule-add-service allow_satellite_prod --hbacsvcs=satellite-prod;
          /usr/bin/ipa hbacrule-add-user allow_satellite_prod --groups=satellite-admin;
@@ -153,7 +156,7 @@
 # on both zones, enable dynamic updates
 #
 
-- name: Run foreman installer to configure capsule
+- name: configure_idmdns_setup | Run foreman installer to configure capsule
   shell: satellite-installer --scenario satellite \
          --foreman-proxy-dns true \
          --foreman-proxy-dns-managed true \
@@ -171,7 +174,7 @@
   tags:
     - idmdns
 
-- name: Restart foreman proxy service
+- name: configure_idmdns_setup | Restart foreman proxy service
   service:
     name: foreman-proxy
     state: restarted

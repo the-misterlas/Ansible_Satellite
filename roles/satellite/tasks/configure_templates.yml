@@ -1,4 +1,4 @@
 ---
-- name: Configure TemplateSync plug-in
+- name: configure_templates | Configure TemplateSync plug-in
   command:  /usr/sbin/satellite-installer --scenario satellite --enable-foreman-plugin-templates
   when: enable_templatesync

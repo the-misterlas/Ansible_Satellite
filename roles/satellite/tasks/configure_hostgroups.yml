@@ -1,5 +1,5 @@
 ---
-- name: Create top level hostgroups
+- name: configure_hostgroups | Create top level hostgroups
   shell: /usr/bin/hammer hostgroup create \
          --name "{{ item.name }}"
   with_items:
@@ -12,7 +12,7 @@
   tags:
     - hostgroups
 
-- name: Configure second level hostgroups
+- name: configure_hostgroups | Configure second level hostgroups
   shell: /usr/bin/hammer hostgroup create \
          --name "{{ item.name }}" \
          --parent "{{ item.parent }}"

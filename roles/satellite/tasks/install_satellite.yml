@@ -1,5 +1,5 @@
 ---
-- name: Get registration status
+- name: install_satellite | Get registration status
   command: /usr/sbin/subscription-manager status
   register: subscription_manager
   changed_when: true
@@ -9,7 +9,7 @@
     - yum
     - disconnected
  
-- name: Error if not registered
+- name: install_satellite | Error if not registered
   debug:
     msg: Please run 'subscription-manager register' and register to Red Hat Customer Portal.
   when:
@@ -18,7 +18,7 @@
     - yum
     - disconnected
  
-- name: Deploy local repo template
+- name: install_satellite | Deploy local repo template
   template:
     src: redhat-local-cdn.repo.j2
     dest: /etc/yum.repos.d/redhat-local-cdn.repo
@@ -31,7 +31,7 @@
     - yum
     - disconnected
 
-- name: Disable all repositories
+- name: install_satellite | Disable all repositories
   rhsm_repository: 
     name: "*"
     state: disabled
@@ -40,7 +40,7 @@
     - configure_repos
     - yum
 
-- name: Enable required repositories
+- name: install_satellite | Enable required repositories
   rhsm_repository: 
     name: "{{ item }}"
     state: enabled
@@ -50,29 +50,29 @@
     - configure_repos
     - yum
 
-- name: Clean Yum repo cache
+- name: install_satellite | Clean Yum repo cache
   command: yum clean all
   tags:
     - yum
 
-- name: Ensure that Red Hat Subscription Manager is not set to use a specific operating system release.
+- name: install_satellite | Ensure that Red Hat Subscription Manager is not set to use a specific operating system release.
   command: /usr/sbin/subscription-manager release --unset
 
-- name: Update all packages
+- name: install_satellite | Update all packages
   yum:
     name: "*"
     state: latest
   register: yum_update
 
 # Check to see if a new kernel was installed during system update
-- name: Checking for new kernel
+- name: install_satellite | Checking for new kernel
   shell: if [ "`rpm -q kernel --queryformat '%{installtime} %{version}-%{release}.%{arch}\n' | sort -n -k1 | tail -1 | cut -d ' ' -f 2`" = "`uname -r`" ]; then echo "Latest kernel already booted."; else echo "New kernel. Reboot required."; fi
   register: kernel_update
   changed_when: false
 # - debug: var=kernel_update
 
 # Reboot the system in the case of new kernel install, then wait for it to come back up
-- name: Reboot the system to apply kernel updates
+- name: install_satellite | Reboot the system to apply kernel updates
   shell: sleep 2 && shutdown -r now "Ansible triggered Reboot"
   async: 1
   poll: 0
@@ -80,17 +80,17 @@
   ignore_errors: true
   when: "('New kernel' in kernel_update.stdout)"
 
-- name: Wait for SSH to become available
+- name: install_satellite | Wait for SSH to become available
   local_action: wait_for host={{ inventory_hostname }} state=started port=22 delay=15 timeout=300
   become: false
   when: "('New kernel' in kernel_update.stdout)"
 
-- name: Install Satellite packages
+- name: install_satellite | Install Satellite packages
   yum:
     name: satellite
     state: latest
 
-- name: Initial configuration of Satellite
+- name: install_satellite | Initial configuration of Satellite
   command:  /usr/sbin/satellite-installer --scenario satellite \
             --foreman-initial-organization "{{ sat_org }}" \
             --foreman-initial-location "{{ sat_loc }}" \

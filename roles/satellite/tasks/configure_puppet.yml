@@ -1,5 +1,5 @@
 ---
-- name: Configure Puppet autosigning rules
+- name: configure_puppet | Configure Puppet autosigning rules
   lineinfile:
     dest: "{{ puppet_vars.dir }}/autosign.conf"
     line: "{{ item }}"
