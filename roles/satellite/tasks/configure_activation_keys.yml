@@ -1,5 +1,5 @@
 ---
-- name: Configure Activation Keys for Library
+- name: configure_activation_keys | Configure Activation Keys for Library
   shell: /usr/bin/hammer activation-key create \
          --name "{{ item[0].cv_name }}-Library-KEY" \
          --content-view "{{ item[0].cv_name }}" \
@@ -19,7 +19,7 @@
   tags:
     - activationkeys
 
-- name: Configure Activation Keys for Lifecycle Environments
+- name: configure_activation_keys | Configure Activation Keys for Lifecycle Environments
   shell: /usr/bin/hammer activation-key create \
          --name "{{ item[0].cv_name }}-{{ item[1].name }}-KEY" \
          --content-view "{{ item[0].cv_name }}" \
@@ -39,7 +39,7 @@
   tags:
     - activationkeys
 
-- name: Enable default repositories for Activation Keys
+- name: configure_activation_keys | Enable default repositories for Activation Keys
   shell: for label in $(/usr/bin/hammer --csv activation-key product-content \
          --name "{{ item[0].cv_name }}-{{ item[1].name }}-KEY" \
          --organization "{{ sat_org }}" \
