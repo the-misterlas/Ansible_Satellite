@@ -229,7 +229,8 @@ content_views:
   - cv_name: "RHVH42-CV"
     cv_label: "RHVH42-CV"
     repos:
-   - cv_name: "RHVM43-CV"
+     - "Red Hat Virtualization Host 7 RPMs x86_64"
+  - cv_name: "RHVM43-CV"
     cv_label: "RHVM43-CV"
     repos:
       - "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
@@ -242,7 +243,6 @@ content_views:
   - cv_name: "RHVH43-CV"
     cv_label: "RHVH43-CV"
     repos:
-      - "Red Hat Virtualization Host 7 RPMs x86_64"
      - "Red Hat Virtualization Host 7 RPMs x86_64"
   - cv_name: "OCP-CV"
     cv_label: "OCP-CV"
