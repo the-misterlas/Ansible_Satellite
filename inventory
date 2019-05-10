@@ -1,11 +1,19 @@
 [satellite]
 192.168.11.10   ansible_user=root
 
-[satellite-beta]
-192.168.11.15   ansible_user=root
+[satellite1]
+satellite1   ansible_user=root
 
-[satellite-test]
-192.168.11.16   ansible_user=root
+[satellite2]
+satellite2   ansible_user=root
+
+[satellite3]
+satellite3   ansible_user=root
+
+[satellite-all]
+satellite1   ansible_user=root
+satellite2   ansible_user=root
+satellite3   ansible_user=root
 
 [idm]
 192.168.11.27   ansible_user=root
