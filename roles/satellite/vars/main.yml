@@ -101,19 +101,21 @@ enable_repos: true
 #  - rhel-7-server-satellite-6.3-rpms
 #  - rhel-server-rhscl-7-rpms
 
-#6.4:
-satellite_repos:
-  - rhel-7-server-rpms 
-  - rhel-server-rhscl-7-rpms 
-  - rhel-7-server-satellite-6.4-rpms 
-  - rhel-7-server-satellite-maintenance-6-rpms 
-  - rhel-7-server-ansible-2.6-rpms
+##6.4:
+#satellite_repos:
+#  - rhel-7-server-rpms 
+#  - rhel-server-rhscl-7-rpms 
+#  - rhel-7-server-satellite-6.4-rpms 
+#  - rhel-7-server-satellite-maintenance-6-rpms 
+#  - rhel-7-server-ansible-2.6-rpms
 
 #6.5
-#satellite_repos: 
-#  - rhel-7-server-rpms
-#  - rhel-7-server-satellite-6.3-rpms
-#  - rhel-server-rhscl-7-rpms
+satellite_repos:
+  - rhel-7-server-rpms
+  - rhel-server-rhscl-7-rpms
+  - rhel-7-server-satellite-6.5-rpms
+  - rhel-7-server-satellite-maintenance-6-rpms
+  - rhel-7-server-ansible-2.6-rpms
 
 #sync values might need increased depending upon connection
 sync_plan:
@@ -141,7 +143,7 @@ pulp_content:
     basearch: "x86_64"
     releasever: "7Server"
   - product: "Red Hat Enterprise Linux Server"
-    name: "Red Hat Satellite Tools 6.4 (for RHEL 7 Server) (RPMs)"
+    name: "Red Hat Satellite Tools 6.5 (for RHEL 7 Server) (RPMs)"
     basearch: "x86_64"
   - product: "Red Hat Enterprise Linux Server"
     name: "Red Hat Storage Native Client for RHEL 7 (RPMs)"
@@ -211,11 +213,11 @@ content_views:
     repos:
       - "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
       - "Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.5"
-      - "Red Hat Satellite Tools 6.4 for RHEL 7 Server RPMs x86_64"
-      - "Red Hat Satellite Tools 6.4 - Puppet 4 for RHEL 7 Server RPMs x86_64"
+      - "Red Hat Satellite Tools 6.5 for RHEL 7 Server RPMs x86_64"
       - "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
       - "Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server"
       - "Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server"
+#      - "Red Hat Satellite Tools 6.4 - Puppet 4 for RHEL 7 Server RPMs x86_64"
   - cv_name: "RHVM42-CV"
     cv_label: "RHVM42-CV"
     repos:
@@ -253,7 +255,7 @@ content_views:
       - "Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server"
       - "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
       - "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
-      - "Red Hat Satellite Tools 6.4 for RHEL 7 Server RPMs x86_64"
+      - "Red Hat Satellite Tools 6.5 for RHEL 7 Server RPMs x86_64"
  
 lifecycle_envs:
   # Library > Development > Testing > Production
